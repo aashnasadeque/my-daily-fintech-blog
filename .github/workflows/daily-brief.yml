@@ -1,0 +1,45 @@
+name: Generate Daily Brief
+
+on:
+  # Run at 6am PST (14:00 UTC) every day
+  schedule:
+    - cron: '0 14 * * *'
+  # Allow manual trigger
+  workflow_dispatch:
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Generate daily brief
+        env:
+          USE_LLM: ${{ secrets.USE_LLM }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: npx tsx scripts/generate-daily.ts
+
+      - name: Check for changes
+        id: git-check
+        run: |
+          git diff --quiet data/briefs/ || echo "changes=true" >> $GITHUB_OUTPUT
+
+      - name: Commit and push if changed
+        if: steps.git-check.outputs.changes == 'true'
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add data/briefs/
+          git commit -m "chore: generate daily brief for $(date +%Y-%m-%d)"
+          git push

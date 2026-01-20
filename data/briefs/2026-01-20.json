@@ -1,0 +1,95 @@
+{
+  "date": "2026-01-20",
+  "title": "Fintech Daily Brief — 2026-01-20",
+  "summary": "Today’s brief spans Payments & Banking, Markets & Macro, Fraud & Risk, Regulation. Momentum is building across core fintech rails while risk and policy themes tighten execution. Expect continued focus on speed, compliance readiness, and resilient operations.",
+  "blocks": [
+    {
+      "section": "Payments & Banking",
+      "what_happened": "Major issuer pilots instant card-to-bank payouts for gig workers; Open-banking API volumes rise as SME lenders expand; Cross-border payments see faster settlement via tokenized deposits.",
+      "why_it_matters": "These moves signal shifting priorities for fintech operators and their partners.",
+      "watchlist": [
+        "Major issuer pilots instant card-to-bank payouts for gig workers",
+        "Open-banking API volumes rise as SME lenders expand",
+        "Cross-border payments see faster settlement via tokenized deposits",
+        "Card networks update dispute rules for merchant-friendly timelines"
+      ],
+      "sources": [
+        {
+          "title": "Major issuer pilots instant card-to-bank payouts for gig workers",
+          "link": "https://example.com/payments/instant-card-to-bank-payouts",
+          "source": "Payments Weekly"
+        },
+        {
+          "title": "Open-banking API volumes rise as SME lenders expand",
+          "link": "https://example.com/banking/open-banking-api-volumes",
+          "source": "Banking APIs Daily"
+        },
+        {
+          "title": "Cross-border payments see faster settlement via tokenized deposits",
+          "link": "https://example.com/crypto/tokenized-deposits-settlement",
+          "source": "Digital Assets Desk"
+        },
+        {
+          "title": "Card networks update dispute rules for merchant-friendly timelines",
+          "link": "https://example.com/payments/dispute-rules-update",
+          "source": "Card Network Journal"
+        }
+      ]
+    },
+    {
+      "section": "Markets & Macro",
+      "what_happened": "Regulators outline new capital guidance for digital banks; Market volatility lifts demand for real-time treasury dashboards.",
+      "why_it_matters": "These moves signal shifting priorities for fintech operators and their partners.",
+      "watchlist": [
+        "Regulators outline new capital guidance for digital banks",
+        "Market volatility lifts demand for real-time treasury dashboards"
+      ],
+      "sources": [
+        {
+          "title": "Regulators outline new capital guidance for digital banks",
+          "link": "https://example.com/regulation/digital-bank-capital-guidance",
+          "source": "Regulatory Wire"
+        },
+        {
+          "title": "Market volatility lifts demand for real-time treasury dashboards",
+          "link": "https://example.com/markets/treasury-dashboard-demand",
+          "source": "Markets Pulse"
+        }
+      ]
+    },
+    {
+      "section": "Fraud & Risk",
+      "what_happened": "Fraud rings shift to synthetic identities targeting BNPL",
+      "why_it_matters": "These moves signal shifting priorities for fintech operators and their partners.",
+      "watchlist": [
+        "Fraud rings shift to synthetic identities targeting BNPL",
+        "Monitor follow-up filings and product rollouts"
+      ],
+      "sources": [
+        {
+          "title": "Fraud rings shift to synthetic identities targeting BNPL",
+          "link": "https://example.com/fraud/synthetic-identity-bnpl",
+          "source": "Risk Monitor"
+        }
+      ]
+    },
+    {
+      "section": "Regulation",
+      "what_happened": "Policy makers propose AI model governance for credit decisions",
+      "why_it_matters": "These moves signal shifting priorities for fintech operators and their partners.",
+      "watchlist": [
+        "Policy makers propose AI model governance for credit decisions",
+        "Monitor follow-up filings and product rollouts"
+      ],
+      "sources": [
+        {
+          "title": "Policy makers propose AI model governance for credit decisions",
+          "link": "https://example.com/regulation/ai-credit-governance",
+          "source": "Policy Ledger"
+        }
+      ]
+    }
+  ],
+  "disclaimer": "Not financial advice.",
+  "mode": "mock"
+}

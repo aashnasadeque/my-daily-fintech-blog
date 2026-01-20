@@ -10,7 +10,7 @@ import type { DailyBrief } from "@/lib/schema";
 
 const STORAGE_KEY = "fintech-brief-archive";
 
-const loadBrief = (date: string): DailyBrief | null => {
+const loadLocalBrief = (date: string): DailyBrief | null => {
   if (typeof window === "undefined") {
     return null;
   }
@@ -29,16 +29,44 @@ const loadBrief = (date: string): DailyBrief | null => {
 export default function BriefPage() {
   const params = useParams<{ date: string }>();
   const [brief, setBrief] = useState<DailyBrief | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
   const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
     setIsMounted(true);
-    if (params?.date) {
-      setBrief(loadBrief(params.date));
-    }
+
+    const loadBrief = async () => {
+      if (!params?.date) {
+        setIsLoading(false);
+        return;
+      }
+
+      // Try localStorage first
+      const localBrief = loadLocalBrief(params.date);
+      if (localBrief) {
+        setBrief(localBrief);
+        setIsLoading(false);
+        return;
+      }
+
+      // Try server API (for auto-generated briefs)
+      try {
+        const response = await fetch(`/api/briefs/${params.date}`);
+        if (response.ok) {
+          const serverBrief = await response.json();
+          setBrief(serverBrief);
+        }
+      } catch {
+        // Brief not found anywhere
+      }
+
+      setIsLoading(false);
+    };
+
+    loadBrief();
   }, [params]);
 
-  if (!isMounted) {
+  if (!isMounted || isLoading) {
     return (
       <div className="min-h-screen bg-slate-50 text-slate-900">
         <main className="mx-auto flex w-full max-w-5xl flex-col gap-8 px-6 py-12">
@@ -68,8 +96,7 @@ export default function BriefPage() {
           </div>
         ) : (
           <div className="rounded-2xl border border-dashed border-slate-200 bg-white p-8 text-slate-500">
-            We couldn't find that brief in local storage. Generate it from the home
-            page to add it to your archive.
+            We couldn't find a brief for this date. It may not have been generated yet.
           </div>
         )}
       </main>

@@ -10,7 +10,7 @@ import type { DailyBrief } from "@/lib/schema";
 
 const STORAGE_KEY = "fintech-brief-archive";
 
-const loadArchive = (): DailyBrief[] => {
+const loadLocalArchive = (): DailyBrief[] => {
   if (typeof window === "undefined") {
     return [];
   }
@@ -23,11 +23,32 @@ const loadArchive = (): DailyBrief[] => {
   }
 };
 
-const saveArchive = (briefs: DailyBrief[]) => {
+const saveLocalArchive = (briefs: DailyBrief[]) => {
   if (typeof window === "undefined") {
     return;
   }
   window.localStorage.setItem(STORAGE_KEY, JSON.stringify(briefs));
+};
+
+/**
+ * Merge server briefs and local briefs, deduplicating by date.
+ * Server briefs take precedence (they're the "official" scheduled ones).
+ */
+const mergeBriefs = (serverBriefs: DailyBrief[], localBriefs: DailyBrief[]): DailyBrief[] => {
+  const byDate = new Map<string, DailyBrief>();
+
+  // Add local briefs first
+  for (const brief of localBriefs) {
+    byDate.set(brief.date, brief);
+  }
+
+  // Server briefs overwrite local ones with same date
+  for (const brief of serverBriefs) {
+    byDate.set(brief.date, brief);
+  }
+
+  // Sort by date descending
+  return Array.from(byDate.values()).sort((a, b) => b.date.localeCompare(a.date));
 };
 
 export default function Home() {
@@ -39,11 +60,30 @@ export default function Home() {
 
   useEffect(() => {
     setIsMounted(true);
-    const stored = loadArchive();
-    setArchive(stored);
-    if (stored.length > 0) {
-      setLatest(stored[0]);
-    }
+
+    // Load from both sources
+    const loadAllBriefs = async () => {
+      const localBriefs = loadLocalArchive();
+
+      // Fetch server-generated briefs
+      let serverBriefs: DailyBrief[] = [];
+      try {
+        const response = await fetch("/api/briefs");
+        if (response.ok) {
+          serverBriefs = await response.json();
+        }
+      } catch {
+        // Server briefs unavailable, use local only
+      }
+
+      const merged = mergeBriefs(serverBriefs, localBriefs);
+      setArchive(merged);
+      if (merged.length > 0) {
+        setLatest(merged[0]);
+      }
+    };
+
+    loadAllBriefs();
   }, []);
 
   const handleGenerate = async () => {
@@ -65,9 +105,14 @@ export default function Home() {
       const brief = (await response.json()) as DailyBrief;
       setLatest(brief);
 
+      // Update local archive (local briefs only)
+      const localBriefs = loadLocalArchive();
+      const nextLocalArchive = [brief, ...localBriefs.filter((item) => item.date !== brief.date)];
+      saveLocalArchive(nextLocalArchive);
+
+      // Update displayed archive
       const nextArchive = [brief, ...archive.filter((item) => item.date !== brief.date)];
       setArchive(nextArchive);
-      saveArchive(nextArchive);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong.");
     } finally {
@@ -114,7 +159,7 @@ export default function Home() {
             </h1>
             <p className="max-w-2xl text-base text-slate-600">
               Generate a curated summary across markets, regulation, payments, digital
-              assets, and risk. Built with mock RSS data so it runs instantly.
+              assets, and risk. Briefs are generated daily at 6am PST automatically.
             </p>
           </div>
 
@@ -125,7 +170,7 @@ export default function Home() {
               disabled={isLoading}
               type="button"
             >
-              {isLoading ? "Generating..." : "Generate Today’s Brief"}
+              {isLoading ? "Generating..." : "Generate Today's Brief"}
             </button>
             {error ? <span className="text-sm text-rose-600">{error}</span> : null}
           </div>
@@ -141,7 +186,7 @@ export default function Home() {
             </div>
           ) : (
             <div className="rounded-2xl border border-dashed border-slate-200 bg-white p-8 text-slate-500">
-              Generate your first brief to see the daily summary and sections.
+              No briefs available yet. Generate your first brief or wait for the daily scheduled generation.
             </div>
           )}
         </section>
@@ -150,7 +195,7 @@ export default function Home() {
           <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
             <h2 className="text-lg font-semibold text-slate-900">Archive</h2>
             <p className="text-sm text-slate-500">
-              Recent briefs saved in your browser.
+              Daily briefs (auto-generated + manual).
             </p>
             <div className="mt-4 space-y-3">
               {archive.length === 0 ? (

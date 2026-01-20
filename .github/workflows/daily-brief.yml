@@ -26,7 +26,7 @@ jobs:
 
       - name: Generate daily brief
         env:
-          USE_LLM: ${{ secrets.USE_LLM }}
+          USE_LLM: 'true'
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         run: npx tsx scripts/generate-daily.ts
 
